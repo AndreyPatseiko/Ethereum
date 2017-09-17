@@ -10,5 +10,10 @@
 
   <button (click)="saveFile()">Save file into brouser</button>
   <button (click)="getFileFromPc()">Upload  file into user PC</button>
+
+  <div>
+    <qr-code [value]="'test data on qr code'" [padding]='1' [size]="152" mime="image/png" #qr></qr-code>
+  </div>
+  <a  [href]="qr.elementRef.nativeElement.childNodes[0].currentSrc" download = 'reddot.png'>Save image in local</a>
 </div>
 
