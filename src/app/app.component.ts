@@ -1,7 +1,9 @@
 import {Component, OnInit} from '@angular/core';
-import {EthereumService} from  './ethereum.service';
+import {EthereumService} from './ethereum.service';
 import {Http, Response, Headers, RequestOptions} from '@angular/http';
 import * as FileSaver from 'file-saver';
+import Web3 from 'web3';
+
 // import {Accounts} from 'web3-eth-accounts';
 
 @Component({
@@ -12,15 +14,47 @@ import * as FileSaver from 'file-saver';
 })
 
 export class AppComponent implements OnInit {
-  info = [];
+  web3: Web3;
   connection = false;
-  elementType : 'url' | 'canvas' | 'img' = 'url';
+  elementType: 'url' | 'canvas' | 'img' = 'url';
 
   constructor(private ethService: EthereumService, private _http: Http) {
+    // this.web3 = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/"));
   }
 
-  ngOnInit() {
-    this.getData();
+  changeLocalStore() {
+    const sendData = {testMessage: 'Lorem ipsume', date: new Date()}
+    localStorage.setItem('saveData', JSON.stringify(sendData));
+  }
+
+  async ngOnInit() {
+    const array = [];
+    console.log('arr before =', array);
+    const add = (i) => {
+      setTimeout(() => {
+        console.log(i)
+      }, 1000)
+    };
+    for (let i = 0; i < 3; i++) {
+      setTimeout(() => {
+        add(i)
+        // array.push(i)
+      }, 0);
+
+    }
+    console.log('arr after =', array)
+
+
+    // console.log(this.web3);
+    //
+    // const self = this;
+    // const filter = this.web3.eth.filter('latest');
+    // filter.watch(function (error, result) {
+    //   const block = self.web3.eth.getBlock(result, true);
+    //   console.log('block #' + block.number);
+    //   console.dir(block.transactions);
+    // });
+    // this.getData();
   }
 
   getData() {
@@ -37,21 +71,21 @@ export class AppComponent implements OnInit {
     //   this.connection = true;
     // }
   }
-  
-  createNewAccount(){    
-    if(!this.connection){
+
+  createNewAccount() {
+    if (!this.connection) {
       // const id = this.web3.personal.newAccount();
-      // console.log('GENERATE NEW ACCOUNT -- id = ', id, ' length = ', id.length)   
+      // console.log('GENERATE NEW ACCOUNT -- id = ', id, ' length = ', id.length)
       this.getData();
-    }  
+    }
   }
 
-  cb(data?) {    
+  cb(data?) {
   }
 
   // ===================================================
   // ===============  Generate and save QR code  =======
-  saveQr(element){
+  saveQr(element) {
     // const base_image = new Image();
     // base_image.src = Base64String;
     // var canvas = document.getElementById('YourCanvas');
@@ -64,8 +98,8 @@ export class AppComponent implements OnInit {
     //   }, "image/png");
 
     // const content = element.elementRef.nativeElement.childNodes[0].currentSrc;
-    console.log('element ', element)    
-    // console.log('content ', content)    
+    console.log('element ', element)
+    // console.log('content ', content)
     // const blob = new Blob(['data:image/png;base64,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'], {type: 'image/png'});
     // FileSaver.saveAs(blob, 'rq-code.png');
   }
@@ -73,14 +107,15 @@ export class AppComponent implements OnInit {
 
   // ===============  Generate and save QR code  =======
   // ===================================================
-  
-  
+
+
   // ===================================================
   // ===============  Save and load File  ==============
 
   saveFile() {
-    const fileContent = {test: 'test message', testData: 'test data for blob file'};
-    const blob = new Blob([JSON.stringify(fileContent, null, 2)], {type: 'application/json'});
+    const fileContent = localStorage.getItem('saveData') ? localStorage.getItem('saveData') : {message: 'not have data in localstorage'};
+    console.log('fileContent ', fileContent)
+    const blob = new Blob([fileContent], {type: 'application/json'});
     FileSaver.saveAs(blob, 'test-export.json');
   }
 
