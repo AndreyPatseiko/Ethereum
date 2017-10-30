@@ -3,6 +3,8 @@ import {EthereumService} from './ethereum.service';
 import {Http, Response, Headers, RequestOptions} from '@angular/http';
 import * as FileSaver from 'file-saver';
 import Web3 from 'web3';
+import {MatDialog} from '@angular/material';
+import {ModalComponent} from './modal/modal.component';
 
 // import {Accounts} from 'web3-eth-accounts';
 
@@ -18,7 +20,7 @@ export class AppComponent implements OnInit {
   connection = false;
   elementType: 'url' | 'canvas' | 'img' = 'url';
 
-  constructor(private ethService: EthereumService, private _http: Http) {
+  constructor(private ethService: EthereumService, private _http: Http, public dialog: MatDialog) {
     // this.web3 = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/"));
   }
 
@@ -78,6 +80,24 @@ export class AppComponent implements OnInit {
       // console.log('GENERATE NEW ACCOUNT -- id = ', id, ' length = ', id.length)
       this.getData();
     }
+  }
+
+  openDialog(): void {
+    const dialogRef = this.dialog.open(ModalComponent);
+
+    dialogRef.afterOpen().subscribe(() => {
+      console.log('The dialog after open');
+    });
+
+    // beforeClose
+    dialogRef.beforeClose().subscribe(() => {
+      console.log('The dialog beforeClose');
+    });
+
+    // afterClose
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
   }
 
   cb(data?) {
